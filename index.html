@@ -211,7 +211,9 @@
     let isVisible = true;
 
     function showImage(idx) {
-      slider.style.transform = `translateX(-${idx * slider.clientWidth}px)`;
+      const img = images[0];
+      const imgWidth = img.getBoundingClientRect().width;
+      slider.style.transform = `translateX(-${idx * imgWidth}px)`;
     }
 
     function nextImage() {
@@ -233,10 +235,10 @@
     }
 
     // Avançar ao tocar/clicar
-    slider.addEventListener('click', () => {
+    document.querySelector('.slider-container').addEventListener('click', () => {
       nextImage();
     });
-    slider.addEventListener('touchstart', () => {
+    document.querySelector('.slider-container').addEventListener('touchstart', () => {
       nextImage();
     });
 
