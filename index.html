@@ -210,9 +210,12 @@
     let interval = null;
     let isVisible = true;
 
+    function getImgWidth() {
+      return images[0].getBoundingClientRect().width;
+    }
+
     function showImage(idx) {
-      const img = images[0];
-      const imgWidth = img.getBoundingClientRect().width;
+      const imgWidth = getImgWidth();
       slider.style.transform = `translateX(-${idx * imgWidth}px)`;
     }
 
@@ -234,12 +237,19 @@
       interval = null;
     }
 
-    // Avançar ao tocar/clicar
-    document.querySelector('.slider-container').addEventListener('click', () => {
+    // Avançar ao tocar/clicar (garante que só avança uma imagem)
+    const sliderContainer = document.querySelector('.slider-container');
+    let lastTouch = 0;
+    sliderContainer.addEventListener('click', () => {
       nextImage();
     });
-    document.querySelector('.slider-container').addEventListener('touchstart', () => {
-      nextImage();
+    sliderContainer.addEventListener('touchstart', (e) => {
+      // Evita múltiplos avanços em toques rápidos
+      const now = Date.now();
+      if (now - lastTouch > 300) {
+        nextImage();
+        lastTouch = now;
+      }
     });
 
     // Pausar quando não visível
@@ -254,7 +264,7 @@
       },
       { threshold: 0.5 }
     );
-    observer.observe(document.querySelector('.slider-container'));
+    observer.observe(sliderContainer);
 
     // Responsivo: ajustar ao redimensionar
     window.addEventListener('resize', () => showImage(current));
