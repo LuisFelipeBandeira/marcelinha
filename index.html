@@ -50,7 +50,8 @@
       position: relative;
       width: 100%;
       max-width: 550px;
-      height: 550px;
+      height: 70vw;
+      max-height: 550px;
       margin: 0 auto 50px;
       overflow: hidden;
       border-radius: 20px;
@@ -63,21 +64,22 @@
 
     .slider {
       display: flex;
-      width: calc(550px * 20);
       height: 100%;
-      animation: slide 30s infinite cubic-bezier(0.4, 0, 0.2, 1);
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
     }
 
     .slider img {
-      width: 550px;
-      height: 550px;
+      width: 100vw;
+      max-width: 550px;
+      height: 70vw;
+      max-height: 550px;
       flex-shrink: 0;
       object-fit: cover;
-      transition: all 0.5s ease-in-out;
       display: block;
+      border-radius: 20px;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .slider img:nth-child(1) { opacity: 1; }
@@ -136,6 +138,14 @@
       header h1 {
         font-size: 2em;
       }
+      .slider-container {
+        height: 90vw;
+        max-height: 90vw;
+      }
+      .slider img {
+        height: 90vw;
+        max-height: 90vw;
+      }
     }
   </style>
 </head>
@@ -192,5 +202,64 @@
   <footer>
     Feito com 💜 por Luisin
   </footer>
+
+  <script>
+    const slider = document.querySelector('.slider');
+    const images = document.querySelectorAll('.slider img');
+    let current = 0;
+    let interval = null;
+    let isVisible = true;
+
+    function showImage(idx) {
+      slider.style.transform = `translateX(-${idx * slider.clientWidth}px)`;
+    }
+
+    function nextImage() {
+      current = (current + 1) % images.length;
+      showImage(current);
+    }
+
+    function startCarousel() {
+      if (!interval) {
+        interval = setInterval(() => {
+          if (isVisible) nextImage();
+        }, 5000);
+      }
+    }
+
+    function stopCarousel() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    // Avançar ao tocar/clicar
+    slider.addEventListener('click', () => {
+      nextImage();
+    });
+    slider.addEventListener('touchstart', () => {
+      nextImage();
+    });
+
+    // Pausar quando não visível
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          startCarousel();
+        } else {
+          stopCarousel();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(document.querySelector('.slider-container'));
+
+    // Responsivo: ajustar ao redimensionar
+    window.addEventListener('resize', () => showImage(current));
+
+    // Inicialização
+    showImage(current);
+    startCarousel();
+  </script>
 </body>
 </html>
